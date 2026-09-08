@@ -36,6 +36,7 @@ export const AppDataSource = new DataSource({
     AddSubjects1786667649646,
     AddImageToUsers1786762021684,
     CreateCommentTable1787064394494,
-    AddBirthDateToUsers1787612400000
+    AddBirthDateToUsers1787612400000,
   ],
+  ssl: env.isProduction ? { rejectUnauthorized: true } : false,
 });

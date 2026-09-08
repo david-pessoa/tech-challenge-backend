@@ -1393,6 +1393,7 @@ components:
             userId: cea50a97-f63e-4cd6-8a2c-e2a02f93c6e4
             nome: Ana Carolina
             tipoUsuario: PROFESSOR
+            image: /api/posts/90b6d80d-b03a-48a6-881d-a695979e8a70/image
           foiVisto: true
 
     ListaPostsProfessor:
@@ -1412,6 +1413,7 @@ components:
             userId: cea50a97-f63e-4cd6-8a2c-e2a02f93c6e4
             nome: Ana Carolina
             tipoUsuario: PROFESSOR
+            image: /api/posts/90b6d80d-b03a-48a6-881d-a695979e8a70/image
           visualizacoes:
             - nome: Maria
               tipoUsuario: ALUNO

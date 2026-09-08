@@ -21,28 +21,34 @@ export class ListPostCommentsService {
         const commentData = await commentRepository.findOne({
           where: { id: comment.id, parentComment: IsNull() },
           relations: {
-            user: true,
-            childComment: true,
+            user: true, 
+            childComment: {
+              user: true,
+            },
             parentComment: true,
           },
         });
 
-        // Se o comentário tem um comentário pai, retorna nulo
-        if(commentData == null)
-          return null
+        if(commentData == null) return null;
 
         return {
-          id: commentData?.id,
-          childComment: commentData?.childComment,
-          user: commentData?.user.nome,
-          conteudo: commentData?.conteudo,
-          dataCriacao: commentData?.dataCriacao,
-          dataModificacao: commentData?.dataModificacao,
+          id: commentData.id,
+          childComment: commentData.childComment ? {
+            id: commentData.childComment.id,
+            conteudo: commentData.childComment.conteudo,
+            dataCriacao: commentData.childComment.dataCriacao,
+            dataModificacao: commentData.childComment.dataModificacao,
+            image: commentData.childComment.user?.image ? `/api/user/${commentData.childComment.user.id}/image` : null,
+          } : null,
+          user: commentData.user.nome,
+          conteudo: commentData.conteudo,
+          dataCriacao: commentData.dataCriacao,
+          dataModificacao: commentData.dataModificacao,
+          image: commentData.user?.image ? `/api/user/${commentData.user.id}/image` : null,
         };
       })
     );
 
-    // Retira valores nulos da lista
     const filteredResult = result.filter(data => data != null);
     return filteredResult;
   }

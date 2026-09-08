@@ -1,4 +1,5 @@
 import { postRepository } from '../../repositories/PostRepository';
+import { User } from '../../entities/User';
 
 export class ListPostsService {
   async execute(userId: string, userRole: string) {
@@ -40,9 +41,9 @@ export class ListPostsService {
         dataCriacao: post.dataCriacao,
         dataModificacao: post.dataModificacao,
         criadoPor: {
-          userId: post.user.id,
-          nome: post.user.nome,
-          tipoUsuario: post.user.role.nome,
+            nome: post.user.nome,
+            tipoUsuario: post.user.role.nome,
+            image: post.user.image ? `/api/user/${post.user.id}/image` : null,
         },
       };
 

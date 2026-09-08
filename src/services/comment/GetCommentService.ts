@@ -24,6 +24,7 @@ export class GetCommentService {
       conteudo: comment.conteudo,
       dataCriacao: comment.dataCriacao,
       dataModificacao: comment.dataModificacao,
+      image: comment.user.image ? `/api/user/${comment.user.id}/image` : null,
     };
   }
 }
