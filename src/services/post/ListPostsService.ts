@@ -41,6 +41,7 @@ export class ListPostsService {
         dataCriacao: post.dataCriacao,
         dataModificacao: post.dataModificacao,
         criadoPor: {
+            userId: post.user.id,
             nome: post.user.nome,
             tipoUsuario: post.user.role.nome,
             image: post.user.image ? `/api/user/${post.user.id}/image` : null,
