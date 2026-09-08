@@ -197,6 +197,7 @@ Crie um arquivo `.env` a partir de [.env.example](./.env.example).
 | `DB_DATABASE` | `tech_challenge` | Sim | Nome do banco |
 | `JWT_SECRET` | `uma-chave-forte` | Sim | Chave usada para assinar o JWT |
 | `JWT_EXPIRES_IN` | `1d` | Não | Tempo de expiração do token |
+| `IS_PRODUCTION` | `false` | Sim | Determina se a aplicação rodará em modo produção (`true`) ou desenvolvimento (`false`) |
 
 ## Endpoints
 | Método | Rota | Autenticação | Permissão | Descrição |

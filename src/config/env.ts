@@ -23,4 +23,5 @@ export const env = {
     secret: required('JWT_SECRET', 'development-secret'),
     expiresIn: process.env.JWT_EXPIRES_IN ?? '1d',
   },
+  isProduction: process.env.IS_PRODUCTION?.toLowerCase() === 'true'
 };
