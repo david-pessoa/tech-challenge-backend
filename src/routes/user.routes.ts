@@ -19,7 +19,6 @@ userRouter.get('/me', userController.getMe.bind(userController));
 
 userRouter.get(
   '/:id',
-  authorizeRoles('ADMIN', 'PROFESSOR'),
   userController.getById.bind(userController)
 );
 

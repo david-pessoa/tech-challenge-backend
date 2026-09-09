@@ -900,14 +900,7 @@ paths:
                 message: ID de usuário inválido
         '401':
           $ref: '#/components/responses/UnauthorizedError'
-        '403':
-          description: Professor tenta consultar um usuário que não é aluno.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-              example:
-                message: Professor não pode acessar dados de outros professores ou administradores!
+        
         '404':
           description: Usuário não encontrado.
           content:

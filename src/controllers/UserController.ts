@@ -6,7 +6,7 @@ export class UserController {
   async getById(request: Request, response: Response, next: NextFunction) {
     try {
       const id = String(request.params.id);
-      const usuario = await userService.getById(id, request.user);
+      const usuario = await userService.getById(id);
 
       return response.status(200).json(usuario);
     } catch (error) {

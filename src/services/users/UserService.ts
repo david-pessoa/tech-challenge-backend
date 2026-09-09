@@ -10,7 +10,7 @@ import { userRepository } from '../../repositories/UserRepository';
 import { roleRepository } from '../../repositories/RoleRepository';
 
 export class UserService {
-  async getById(id: string, usuarioLogado: User) {
+  async getById(id: string) {
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
     if (!uuidRegex.test(id)) {
@@ -24,13 +24,6 @@ export class UserService {
 
     if (!user) {
       throw new AppError(404, 'Usuário não encontrado');
-    }
-
-    if (usuarioLogado.role.nome === 'PROFESSOR' && user.role.nome !== 'ALUNO') {
-      throw new AppError(
-        403,
-        'Professor não pode acessar dados de outros professores ou administradores!'
-      );
     }
 
     return {

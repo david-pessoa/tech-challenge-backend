@@ -364,7 +364,7 @@ describe('UserService - Busca de usuário por ID', () => {
 
     (userRepository.findOne as jest.Mock).mockResolvedValue(usuario);
 
-    const resultado = await userService.getById(idValido, adminLogado);
+    const resultado = await userService.getById(idValido);
 
     expect(resultado).toEqual({
       id: usuario.id,
@@ -388,31 +388,13 @@ describe('UserService - Busca de usuário por ID', () => {
 
     (userRepository.findOne as jest.Mock).mockResolvedValue(usuario);
 
-    const resultado = await userService.getById(idValido, professorLogado);
+    const resultado = await userService.getById(idValido);
 
     expect(resultado.role).toBe('ALUNO');
   });
 
-  it('Não deve permitir que um PROFESSOR busque um usuário que não é ALUNO', async () => {
-    const usuario = {
-      id: idValido,
-      matricula: '345678',
-      nome: 'Novo Prof',
-      senha: 'senha_criptografada_fake',
-      image: null,
-      role: roleProfessor,
-    } as User;
-
-    (userRepository.findOne as jest.Mock).mockResolvedValue(usuario);
-
-    await expect(userService.getById(idValido, professorLogado)).rejects.toMatchObject({
-      statusCode: 403,
-      message: 'Professor não pode acessar dados de outros professores ou administradores!',
-    });
-  });
-
   it('Não deve buscar usuário com ID inválido', async () => {
-    await expect(userService.getById('id-invalido', adminLogado)).rejects.toMatchObject({
+    await expect(userService.getById('id-invalido')).rejects.toMatchObject({
       statusCode: 400,
       message: 'ID de usuário inválido',
     });
@@ -423,7 +405,7 @@ describe('UserService - Busca de usuário por ID', () => {
   it('Não deve buscar usuário inexistente', async () => {
     (userRepository.findOne as jest.Mock).mockResolvedValue(null);
 
-    await expect(userService.getById(idValido, adminLogado)).rejects.toMatchObject({
+    await expect(userService.getById(idValido)).rejects.toMatchObject({
       statusCode: 404,
       message: 'Usuário não encontrado',
     });
