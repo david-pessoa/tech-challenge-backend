@@ -40,7 +40,10 @@ export class ListPostCommentsService {
             dataModificacao: commentData.childComment.dataModificacao,
             image: commentData.childComment.user?.image ? `/api/user/${commentData.childComment.user.id}/image` : null,
           } : null,
-          user: commentData.user.nome,
+          user: {
+            id: commentData.user.id,
+            nome: commentData.user.nome
+          },
           conteudo: commentData.conteudo,
           dataCriacao: commentData.dataCriacao,
           dataModificacao: commentData.dataModificacao,

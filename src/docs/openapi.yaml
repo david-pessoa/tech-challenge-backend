@@ -682,7 +682,9 @@ paths:
                   $ref: '#/components/schemas/Commment'
               example:
                 - id: 428e7264-b4fa-46c6-a595-568e27b947d5
-                  user: Francisco
+                  user: 
+                    id: 428e7264-b4fa-46c6-a595-568e27b947d5
+                    nome: Francisco
                   conteudo: Conteúdo do Post... Lorem Ipsum dolor sit amet
                   dataCriacao: 2026-08-18T21:57:04.433Z
                   dataModificacao: 2026-08-18T21:57:04.433Z
@@ -693,13 +695,17 @@ paths:
                     conteudo: Resposta do professor
                     dataCriacao: 2026-08-18T21:57:04.433Z
                     dataModificacao: 2026-08-18T21:57:04.433Z
-                  user: Francisco
+                  user: 
+                    id: 428e7264-b4fa-46c6-a595-568e27b947d5
+                    nome: Francisco
                   conteudo: Conteúdo do Post... Lorem Ipsum dolor sit amet
                   dataCriacao: 2026-08-18T21:57:04.433Z
                   dataModificacao: 2026-08-18T21:57:04.433Z
 
                 - id: 428e7264-b4fa-46c6-a595-568e27b947d5
-                  user: Francisco
+                  user: 
+                    id: 428e7264-b4fa-46c6-a595-568e27b947d5
+                    nome: Francisco
                   conteudo: Conteúdo do Post... Lorem Ipsum dolor sit amet
                   dataCriacao: 2026-08-18T21:57:04.433Z
                   dataModificacao: 2026-08-18T21:57:04.433Z
