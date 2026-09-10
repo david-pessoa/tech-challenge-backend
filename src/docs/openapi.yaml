@@ -24,7 +24,7 @@ paths:
       summary: Listar todos os posts
       description: Retorna a lista de posts. Para alunos, informa se o post já foi visualizado. Para professores e administradores, informa os alunos que visualizaram o post.
       security:
-        - bearerAuth: []
+        - sessionCookie: []
       responses:
         '200':
           description: Lista de posts retornada com sucesso.
@@ -53,7 +53,7 @@ paths:
       summary: Criar um novo post
       description: Permite que professores e administradores autenticados criem novas postagens.
       security:
-        - bearerAuth: []
+        - sessionCookie: []
       requestBody:
         required: true
         content:
@@ -125,7 +125,7 @@ paths:
       summary: Obter um post pelo ID
       description: Retorna o conteúdo completo de um post específico. Quando acessado por um aluno, registra automaticamente a visualização do post.
       security:
-        - bearerAuth: []
+        - sessionCookie: []
       parameters:
         - name: id
           in: path
@@ -164,7 +164,7 @@ paths:
       summary: Atualizar um post
       description: Permite que administradores atualizem qualquer post e professores atualizem apenas os posts que criaram.
       security:
-        - bearerAuth: []
+        - sessionCookie: []
       parameters:
         - name: id
           in: path
@@ -237,7 +237,7 @@ paths:
       summary: Excluir um post
       description: Permite que administradores excluam qualquer post e professores excluam apenas os posts que criaram.
       security:
-        - bearerAuth: []
+        - sessionCookie: []
       parameters:
         - name: id
           in: path
@@ -281,7 +281,7 @@ paths:
       summary: Buscar posts
       description: Busca posts por palavras-chave presentes no título, descrição ou conteúdo, sem diferenciar letras maiúsculas e minúsculas.
       security:
-        - bearerAuth: []
+        - sessionCookie: []
       parameters:
         - name: termo
           in: query
@@ -402,7 +402,7 @@ paths:
       summary: Cria um novo comentário num post
       description: Retorna uma mensagem indicando sucesso. O parâmetro da rota representa o ID do post.
       security:
-        - bearerAuth: []
+        - sessionCookie: []
       parameters:
         - name: postId
           in: path
@@ -494,7 +494,7 @@ paths:
       summary: Obtém um comentário pelo ID
       description: Esta rota obtém todos os dados de um post fornecendo apenas seu ID
       security:
-        - bearerAuth: []
+        - sessionCookie: []
       parameters:
         - name: commentId
           in: path
@@ -540,7 +540,7 @@ paths:
       summary: Atualiza os dados do comentário
       description: Esta rota atualiza o conteúdo de um comentário
       security:
-        - bearerAuth: []
+        - sessionCookie: []
       parameters:
         - name: commentId
           in: path
@@ -610,7 +610,7 @@ paths:
       summary: Deletar um comentário de um post pelo ID
       description: Deleta um comentário. Apenas o autor do comentário, ou o autor do post ou um Admin podem deletar um comentário
       security:
-        - bearerAuth: []
+        - sessionCookie: []
       parameters:
         - name: commentId
           in: path
@@ -663,7 +663,7 @@ paths:
       summary: Obtém lista com todos os dados dos comentários vinculados a um post
       description: Esta rota obtém todos os dados dos comentários de um post fornecendo apenas seu ID
       security:
-        - bearerAuth: []
+        - sessionCookie: []
       parameters:
         - name: postId
           in: path
@@ -731,7 +731,7 @@ paths:
       summary: Listar usuários
       description: Lista usuários cadastrados. Administradores visualizam todos os usuários; professores visualizam apenas alunos.
       security:
-        - bearerAuth: []
+        - sessionCookie: []
       responses:
         '200':
           description: Usuários retornados com sucesso.
@@ -759,7 +759,7 @@ paths:
       summary: Criar usuário
       description: Cria um novo usuário no sistema.
       security:
-        - bearerAuth: []
+        - sessionCookie: []
       requestBody:
         required: true
         content:
@@ -875,7 +875,7 @@ paths:
       summary: Obter usuário pelo ID
       description: Retorna os dados de um usuário específico. Administradores podem consultar qualquer usuário; professores podem consultar apenas alunos.
       security:
-        - bearerAuth: []
+        - sessionCookie: []
       parameters:
         - name: id
           in: path
@@ -922,7 +922,7 @@ paths:
       summary: Atualizar os dados de um usuário
       description: Permite que apenas administradores e professores atualizem os dados dos usuários.
       security:
-        - bearerAuth: []
+        - sessionCookie: []
       parameters:
         - name: id
           in: path
@@ -1027,7 +1027,7 @@ paths:
       summary: Deletar usuário
       description: Deleta um usuário do sistema. Apenas administradores podem deletar usuários. Quando o usuário excluído for criador de posts, seus posts também são excluídos. As visualizações vinculadas a esses posts são excluídas em cascata.
       security:
-        - bearerAuth: []
+        - sessionCookie: []
       parameters:
         - name: id
           in: path
@@ -1074,7 +1074,7 @@ paths:
       summary: Obter dados do usuário Logado
       description: Essa rota obtém todos os dados do usuário logado que estão na tabela Users e também a Role dele
       security:
-        - bearerAuth: []
+        - sessionCookie: []
       responses:
         '200':
           description: Dados do usuário logado obtidos com sucesso.
@@ -1193,8 +1193,6 @@ paths:
                 properties:
                   message:
                     type: string
-                  token:
-                    type: string
                   usuario:
                     type: object
                     properties:
@@ -1216,7 +1214,6 @@ paths:
                         description: Endpoint da URL da foto de perfil do usuário.
               example:
                 message: Login realizado com sucesso!
-                token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjMmI1OGE0ZS1jNGNmLTRlMjAtOTc4Yy1jMWYyNzkzZWUxOGMiLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3ODI2OTYyNzUsImV4cCI6MTc4Mjc4MjY3NX0.GlTIaBuM4hpLlgBSoPduxG2A_SvEE7Xnzf4szdjw_ZE
                 usuario:
                   id: c2b58a4e-c4cf-4e20-978c-c1f2793ee18c
                   nome: Francisco
@@ -1236,12 +1233,29 @@ paths:
               example:
                 message: Matrícula ou senha inválidas
 
+  /auth/logout:
+    post:
+      tags:
+        - Autenticação
+      summary: Encerrar sessão
+      description: Remove o cookie HttpOnly da sessão atual.
+      responses:
+        '200':
+          description: Logout realizado com sucesso.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
 components:
   securitySchemes:
-    bearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
+    sessionCookie:
+      type: apiKey
+      in: cookie
+      name: session
   schemas:
     PostBase:
       type: object

@@ -21,7 +21,14 @@ export const env = {
   },
   jwt: {
     secret: required('JWT_SECRET', 'development-secret'),
-    expiresIn: process.env.JWT_EXPIRES_IN ?? '1d',
+    expiresIn: process.env.JWT_EXPIRES_IN ?? '1h',
   },
-  isProduction: process.env.IS_PRODUCTION?.toLowerCase() === 'true'
+  auth: {
+    cookieName: process.env.AUTH_COOKIE_NAME ?? 'session',
+    cookieMaxAgeMs: Number(process.env.AUTH_COOKIE_MAX_AGE_MS ?? 60 * 60 * 1000),
+  },
+  cors: {
+    origin: process.env.FRONTEND_URL ?? 'http://localhost:5173',
+  },
+  isProduction: process.env.IS_PRODUCTION?.toLowerCase() === 'true',
 };

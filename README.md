@@ -198,12 +198,16 @@ Crie um arquivo `.env` a partir de [.env.example](./.env.example).
 | `JWT_SECRET` | `uma-chave-forte` | Sim | Chave usada para assinar o JWT |
 | `JWT_EXPIRES_IN` | `1d` | Não | Tempo de expiração do token |
 | `IS_PRODUCTION` | `false` | Sim | Determina se a aplicação rodará em modo produção (`true`) ou desenvolvimento (`false`) |
+| `AUTH_COOKIE_NAME` | `session` | Sim | Determina nome do cookie HttpOnly |
+| `AUTH_COOKIE_MAX_AGE_MS` | `3600000` | Não | Determina o tempo de vida do cookie |
+| `FRONTEND_URL` | `http://localhost:5173` | Sim | URL do Front-end |
 
 ## Endpoints
 | Método | Rota | Autenticação | Permissão | Descrição |
 | --- | --- | --- | --- | --- |
 | `GET` | `/docs` | Não | - | Documentação Swagger da API |
-| `POST` | `/api/auth/login` | Não | - | Realiza login e retorna token JWT |
+| `POST` | `/api/auth/login` | Não | - | Realiza login e cria sessão em cookie HttpOnly |
+| `POST` | `/api/auth/logout` | Não | - | Remove o cookie de sessão |
 | `GET` | `/api/user` | Sim | `PROFESSOR`, `ADMIN` | Lista usuários cadastrados. O Admin vê todos os usuários, enquanto os professores têm acesso apenas aos alunos |
 | `POST` | `/api/user` | Sim | `PROFESSOR`, `ADMIN` | Cadastra um novo usuário |
 | `GET` | `/api/user/:id` | Sim | Qualquer usuário autenticado | Obtém os dados do usuário pelo ID |
@@ -228,15 +232,12 @@ Crie um arquivo `.env` a partir de [.env.example](./.env.example).
 > *OBS: Quando um usuário professor cria um post, ele será o único professor que poderá editá-lo. Contudo, administradores podem realizar todas as ações de CRUD com qualquer post, mesmo não tendo criado o post.
 
 ## Autenticação
-A autenticação é feita com JWT.
-O endpoint `/api/auth/login` valida matrícula e senha, retorna o token e os dados básicos do usuário.
+A autenticação é feita com JWT armazenado em um cookie `HttpOnly` chamado `session`.
+O endpoint `/api/auth/login` valida matrícula e senha, envia o cookie e retorna apenas os dados básicos do usuário.
+O cliente deve enviar requisições com credenciais habilitadas (por exemplo, Axios com `withCredentials: true`).
+No logout, o endpoint `/api/auth/logout` remove o cookie.
 
-Nas rotas protegidas, o cliente deve enviar o header:
-```http
-Authorization: Bearer <token>
-```
-
-O middleware `authMiddleware` valida o token, busca o usuário no banco e anexa os dados à requisição.
+O middleware `authMiddleware` lê o cookie, valida o token, busca o usuário no banco e anexa os dados à requisição.
 Depois disso, `authorizeRoles` restringe o acesso conforme o perfil.
 
 ## Decisões técnicas

@@ -17,15 +17,19 @@ declare global {
 export async function authMiddleware(request: Request, response: Response, next: NextFunction) {
   try {
     const authHeader = request.headers.authorization;
+    const cookieHeader = request.headers.cookie;
+    const cookiePrefix = `${env.auth.cookieName}=`;
+    const cookieToken = cookieHeader
+      ?.split(';')
+      .map(cookie => cookie.trim())
+      .find(cookie => cookie.startsWith(cookiePrefix))
+      ?.slice(cookiePrefix.length);
 
-    if (!authHeader) {
+    // Cookie é o mecanismo principal. O Bearer é mantido apenas para compatibilidade.
+    const token = cookieToken ?? (authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : undefined);
+
+    if (!token) {
       throw new AppError(401, 'Token não informado');
-    }
-
-    const [tipo, token] = authHeader.split(' ');
-
-    if (tipo !== 'Bearer' || !token) {
-      throw new AppError(401, 'Formato de token inválido');
     }
 
     const payload = jwt.verify(token, env.jwt.secret) as { sub: string };
