@@ -31,7 +31,7 @@ export class PostController {
       const id = String(request.params.id);
       const post = await getPostService.execute(id);
 
-      if (request.user!.role.nome === 'ALUNO') {
+      if (request.user!.role.nome === 'ALUNO' || request.user!.role.nome === 'ADMIN') {
         await markPostAsViewedService.execute(id, request.user!.id);
       }
 

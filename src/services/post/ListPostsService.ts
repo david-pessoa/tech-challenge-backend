@@ -48,7 +48,7 @@ export class ListPostsService {
         },
       };
 
-      if (userRole === 'ALUNO') {
+      if (userRole === 'ALUNO' || userRole === 'ADMIN') {
         return {
           ...basePost,
           foiVisto:
