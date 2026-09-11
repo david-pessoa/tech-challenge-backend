@@ -165,7 +165,9 @@ export class UserService {
       usuario.senha = await bcrypt.hash(dados.senha, 10);
     }
 
-    if (dados.image) {
+    if (dados.removeImage === true || dados.removeImage === 'true') {
+      usuario.image = null;
+    } else if (dados.image) {
       usuario.image = dados.image;
     }
 
