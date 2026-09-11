@@ -7,4 +7,5 @@ export interface UpdateUserDTO {
   senha?: string;
   role?: string;
   image?: Buffer | null;
+  removeImage?: string | boolean;
 }
