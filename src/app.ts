@@ -9,6 +9,7 @@ import { userRouter } from './routes/user.routes';
 import { authRouter } from './routes/auth.routes';
 import { commentRoutes } from './routes/comment.routes';
 import { errorHandler } from './middlewares/errorHandler';
+import { env } from './config/env';
 
 export const app = express();
 
@@ -28,8 +29,10 @@ app.use(express.json());
 
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, swaggerOptions));
 
-app.use(cors()); // permite requisições de qualquer origem
-app.use(express.json());
+app.use(cors({
+  origin: env.cors.origin,
+  credentials: true,
+}));
 
 // Rotas da aplicação
 app.use('/api/posts', postRoutes);
