@@ -7,7 +7,7 @@ info:
 servers:
   - url: http://localhost:3000/api
     description: Servidor Local
-  - url: https://tech-challenge-fase-2-1uhu.onrender.com/api
+  - url: https://tech-challenge-backend-cuv5.onrender.com/api
     description: Servidor em Produção (Render)
 
 tags:
