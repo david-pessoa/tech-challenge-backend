@@ -32,7 +32,7 @@ export class AuthController {
       response.clearCookie(env.auth.cookieName, {
         httpOnly: true,
         secure: env.isProduction,
-        sameSite: 'lax',
+        sameSite: cookieOptions.sameSite,
         path: '/',
       });
       response.json({ message: 'Logout realizado com sucesso!' });
