@@ -25,6 +25,8 @@ export async function authMiddleware(request: Request, response: Response, next:
       .find(cookie => cookie.startsWith(cookiePrefix))
       ?.slice(cookiePrefix.length);
 
+      
+      console.log("Headers:", request.headers)
     // Cookie é o mecanismo principal. O Bearer é mantido apenas para compatibilidade.
     const token = cookieToken ?? (authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : undefined);
 
