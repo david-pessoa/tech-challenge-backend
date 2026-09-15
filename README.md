@@ -1,6 +1,7 @@
-# API de Gerenciamento de Posts
-API backend para cadastro de usuários, autenticação via JWT e gerenciamento de posts com controle de perfis.
-O sistema permite criar, listar, buscar, atualizar, excluir e marcar posts como visualizados.
+# API do Edify
+API do aplicativo Edify backend para cadastro de usuários, autenticação via JWT e gerenciamento de posts com controle de perfis.
+O sistema permite realizar CRUD com posts e marcá-los como vistos, CRUD com usuários e comentários de usuários em posts.  
+[Clique aqui](https://github.com/david-pessoa/tech-challenge-frontend) para acessar o repositório com o front-end em React da aplicação
 
 ## Problema
 Em escolas da rede pública, os professores não têm uma plataforma em que possam postar suas aulas e transmitir conhecimento para alunos de forma prática, centralizada e tecnológica. Além disso, é preciso controlar quem pode criar, atualizar e deletar materiais e registrar quem já visualizou cada postagem.
@@ -9,9 +10,6 @@ Sem uma API centralizada, esse fluxo fica disperso e difícil de auditar.
 ## Solução
 Foi construída uma API REST em Node.js para gerenciar usuários, roles, autenticação, posts e visualizações.
 A solução organiza o fluxo com Express, TypeORM, PostgreSQL e JWT, além de documentação Swagger disponível em `/docs`.
-
-### Link para API em produção no Render:
-[https://tech-challenge-fase-2-1uhu.onrender.com/docs/#/Usu%C3%A1rios/post_user](https://tech-challenge-fase-2-1uhu.onrender.com/docs/#/Usu%C3%A1rios/post_user)
 
 ### Níveis de acesso dentro do sistema
 Há 3 diferentes níveis de acesso (roles) para a API. Eles são: `ALUNO`, `PROFESSOR` e `ADMIN`.
