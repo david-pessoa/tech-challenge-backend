@@ -1,12 +1,17 @@
-import { userService } from '../services/users/UserService';
+
 import { userRepository } from '../repositories/UserRepository';
 import { roleRepository } from '../repositories/RoleRepository';
 import { User } from '../entities/User';
 import { Role } from '../entities/Role';
+import { createUserService } from '../services/users/CreateUserService';
+import { listUsersService } from '../services/users/ListUsersService';
+import { updateUserService } from '../services/users/UpdateUserService';
+import { getUserService } from '../services/users/GetUserService';
 
 jest.mock('../repositories/UserRepository', () => ({
   userRepository: {
     find: jest.fn(),
+    findAndCount: jest.fn(),
     findOne: jest.fn(),
     create: jest.fn(),
     save: jest.fn(),
@@ -29,7 +34,10 @@ describe('UserService - Criação de Usuários', () => {
   const roleAluno = { id: 'ffc3d557-17c0-474e-a2f5-5fa816f2d854', nome: 'ALUNO' } as Role;
 
   const adminLogado = { id: '16dd67fd-afec-4080-a36f-0c8605d9c662', role: roleAdmin } as User;
-  const professorLogado = { id: 'cea50a97-f63e-4cd6-8a2c-e2a02f93c6e4', role: roleProfessor } as User;
+  const professorLogado = {
+    id: 'cea50a97-f63e-4cd6-8a2c-e2a02f93c6e4',
+    role: roleProfessor,
+  } as User;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -49,7 +57,7 @@ describe('UserService - Criação de Usuários', () => {
     (userRepository.create as jest.Mock).mockReturnValue(mockUsuarioSalvo);
     (userRepository.save as jest.Mock).mockResolvedValue(mockUsuarioSalvo);
 
-    const resultado = await userService.create(
+    const resultado = await createUserService.execute(
       { matricula: '345678', nome: 'Novo Prof', senha: 'Prof345', role: 'PROFESSOR' },
       adminLogado
     );
@@ -61,7 +69,7 @@ describe('UserService - Criação de Usuários', () => {
 
   it('Deve permitir que um PROFESSOR crie um ALUNO', async () => {
     (userRepository.findOne as jest.Mock).mockResolvedValue(null);
-    (roleRepository.findOne as jest.Mock).mockResolvedValue(roleAluno); 
+    (roleRepository.findOne as jest.Mock).mockResolvedValue(roleAluno);
 
     const mockUsuarioSalvo = {
       matricula: '874569',
@@ -73,7 +81,7 @@ describe('UserService - Criação de Usuários', () => {
     (userRepository.create as jest.Mock).mockReturnValue(mockUsuarioSalvo);
     (userRepository.save as jest.Mock).mockResolvedValue(mockUsuarioSalvo);
 
-    const resultado = await userService.create(
+    const resultado = await createUserService.execute(
       { matricula: '874569', nome: 'Novo Aluno', senha: 'Aluni936', role: 'ALUNO' },
       professorLogado
     );
@@ -82,15 +90,14 @@ describe('UserService - Criação de Usuários', () => {
     expect(userRepository.save).toHaveBeenCalled();
   });
 
-
   it('Não deve permitir que um PROFESSOR crie um ADMIN', async () => {
     (userRepository.findOne as jest.Mock).mockResolvedValue(null);
     (roleRepository.findOne as jest.Mock).mockResolvedValue(roleAdmin);
 
     await expect(
-      userService.create(
+      createUserService.execute(
         { matricula: '754914', nome: 'Admin Invasor', senha: 'Admin853', role: 'ADMIN' },
-        professorLogado 
+        professorLogado
       )
     ).rejects.toMatchObject({
       statusCode: 403,
@@ -102,12 +109,12 @@ describe('UserService - Criação de Usuários', () => {
 
   it('Não deve permitir que um PROFESSOR crie outro PROFESSOR', async () => {
     (userRepository.findOne as jest.Mock).mockResolvedValue(null);
-    (roleRepository.findOne as jest.Mock).mockResolvedValue(roleProfessor); 
+    (roleRepository.findOne as jest.Mock).mockResolvedValue(roleProfessor);
 
     await expect(
-      userService.create(
+      createUserService.execute(
         { matricula: '564959', nome: 'Prof Falso', senha: 'Prof457', role: 'PROFESSOR' },
-        professorLogado 
+        professorLogado
       )
     ).rejects.toMatchObject({
       statusCode: 403,
@@ -121,7 +128,7 @@ describe('UserService - Criação de Usuários', () => {
     (userRepository.findOne as jest.Mock).mockResolvedValue(new User());
 
     await expect(
-      userService.create(
+      createUserService.execute(
         { matricula: '000', nome: 'Clone', senha: 'Clone754', role: 'PROFESSOR' },
         adminLogado
       )
@@ -143,11 +150,11 @@ describe('UserService - Criação de Usuários', () => {
       role: roleAluno,
     } as User;
 
-    (userRepository.find as jest.Mock).mockResolvedValue([usuario]);
+    (userRepository.findAndCount as jest.Mock).mockResolvedValue([[usuario], 1]);
 
-    const resultado = await userService.list(adminLogado);
+    const resultado = await listUsersService.execute(adminLogado);
 
-    expect(resultado).toEqual([
+    expect(resultado.users).toEqual([
       {
         id: usuario.id,
         matricula: usuario.matricula,
@@ -157,23 +164,25 @@ describe('UserService - Criação de Usuários', () => {
         role: roleAluno.nome,
       },
     ]);
-    expect(resultado[0]).not.toHaveProperty('senha');
-    expect(userRepository.find).toHaveBeenCalledWith({
+    expect(resultado.users[0]).not.toHaveProperty('senha');
+    expect(userRepository.findAndCount).toHaveBeenCalledWith({
       where: {},
       relations: ['role'],
       order: {
         nome: 'ASC',
       },
+      take: 10,
+      skip: 0
     });
   });
 
   it('Deve permitir que um PROFESSOR liste apenas alunos', async () => {
-    (userRepository.find as jest.Mock).mockResolvedValue([]);
+    (userRepository.findAndCount as jest.Mock).mockResolvedValue([[], 0]);
 
-    const resultado = await userService.list(professorLogado);
+    const resultado = await listUsersService.execute(professorLogado);
 
-    expect(resultado).toEqual([]);
-    expect(userRepository.find).toHaveBeenCalledWith({
+    expect(resultado.users).toEqual([]);
+    expect(userRepository.findAndCount).toHaveBeenCalledWith({
       where: {
         role: {
           nome: 'ALUNO',
@@ -183,6 +192,8 @@ describe('UserService - Criação de Usuários', () => {
       order: {
         nome: 'ASC',
       },
+      take: 10,
+      skip: 0
     });
   });
 });
@@ -193,7 +204,10 @@ describe('UserService - Atualização de Usuários', () => {
   const roleAdmin = { id: 'bd1de63c-5df5-4dfd-9736-ace2d7f092b1', nome: 'ADMIN' } as Role;
 
   const adminLogado = { id: '16dd67fd-afec-4080-a36f-0c8605d9c662', role: roleAdmin } as User;
-  const professorLogado = { id: 'cea50a97-f63e-4cd6-8a2c-e2a02f93c6e4', role: roleProfessor } as User;
+  const professorLogado = {
+    id: 'cea50a97-f63e-4cd6-8a2c-e2a02f93c6e4',
+    role: roleProfessor,
+  } as User;
 
   const idValido = '16dd67fd-afec-4080-a36f-0c8605d9c662';
   const idInvalido = 'id-invalido';
@@ -203,12 +217,17 @@ describe('UserService - Atualização de Usuários', () => {
   });
 
   it('Deve atualizar o nome de um usuário existente', async () => {
-    const usuarioExistente = { id: idValido, nome: 'Nome Antigo', senha: 'senha_antiga', role: roleAluno } as User;
+    const usuarioExistente = {
+      id: idValido,
+      nome: 'Nome Antigo',
+      senha: 'senha_antiga',
+      role: roleAluno,
+    } as User;
 
     (userRepository.findOne as jest.Mock).mockResolvedValue(usuarioExistente);
     (userRepository.save as jest.Mock).mockResolvedValue(usuarioExistente);
 
-    const resultado = await userService.update(idValido, { nome: 'Nome Novo' }, adminLogado);
+    const resultado = await updateUserService.execute(idValido, { nome: 'Nome Novo' }, adminLogado);
 
     expect(resultado).toHaveProperty('nome', 'Nome Novo');
     expect(resultado).not.toHaveProperty('senha');
@@ -216,38 +235,53 @@ describe('UserService - Atualização de Usuários', () => {
   });
 
   it('Deve criptografar a nova senha ao atualizar', async () => {
-    const usuarioExistente = { id: idValido, nome: 'Fulano', senha: 'senha_antiga', role: roleAluno } as User;
+    const usuarioExistente = {
+      id: idValido,
+      nome: 'Fulano',
+      senha: 'senha_antiga',
+      role: roleAluno,
+    } as User;
 
     (userRepository.findOne as jest.Mock).mockResolvedValue(usuarioExistente);
     (userRepository.save as jest.Mock).mockResolvedValue(usuarioExistente);
 
-    await userService.update(idValido, { senha: 'NovaSenha123' }, adminLogado);
+    await updateUserService.execute(idValido, { senha: 'NovaSenha123' }, adminLogado);
 
     expect(usuarioExistente.senha).toBe('senha_criptografada_fake');
     expect(userRepository.save).toHaveBeenCalled();
   });
 
   it('Deve atualizar a role de um usuário para uma role válida', async () => {
-    const usuarioExistente = { id: idValido, nome: 'Fulano', senha: 'senha_antiga', role: roleAluno } as User;
+    const usuarioExistente = {
+      id: idValido,
+      nome: 'Fulano',
+      senha: 'senha_antiga',
+      role: roleAluno,
+    } as User;
 
     (userRepository.findOne as jest.Mock).mockResolvedValue(usuarioExistente);
     (roleRepository.findOne as jest.Mock).mockResolvedValue(roleProfessor);
     (userRepository.save as jest.Mock).mockResolvedValue(usuarioExistente);
 
-    const resultado = await userService.update(idValido, { role: 'PROFESSOR' }, adminLogado);
+    const resultado = await updateUserService.execute(idValido, { role: 'PROFESSOR' }, adminLogado);
 
     expect(resultado.role).toEqual(roleProfessor);
     expect(userRepository.save).toHaveBeenCalled();
   });
 
   it('Não deve atualizar para uma role inexistente', async () => {
-    const usuarioExistente = { id: idValido, nome: 'Fulano', senha: 'senha_antiga', role: roleAluno } as User;
+    const usuarioExistente = {
+      id: idValido,
+      nome: 'Fulano',
+      senha: 'senha_antiga',
+      role: roleAluno,
+    } as User;
 
     (userRepository.findOne as jest.Mock).mockResolvedValue(usuarioExistente);
     (roleRepository.findOne as jest.Mock).mockResolvedValue(null);
 
     await expect(
-      userService.update(idValido, { role: 'INEXISTENTE' }, adminLogado)
+      updateUserService.execute(idValido, { role: 'INEXISTENTE' }, adminLogado)
     ).rejects.toMatchObject({
       statusCode: 400,
       message: 'Role não encontrada',
@@ -258,7 +292,7 @@ describe('UserService - Atualização de Usuários', () => {
 
   it('Não deve atualizar um usuário com id em formato inválido', async () => {
     await expect(
-      userService.update(idInvalido, { nome: 'Qualquer Nome' }, adminLogado)
+      updateUserService.execute(idInvalido, { nome: 'Qualquer Nome' }, adminLogado)
     ).rejects.toMatchObject({
       statusCode: 404,
       message: 'Usuário não encontrado',
@@ -272,7 +306,7 @@ describe('UserService - Atualização de Usuários', () => {
     (userRepository.findOne as jest.Mock).mockResolvedValue(null);
 
     await expect(
-      userService.update(idValido, { nome: 'Qualquer Nome' }, adminLogado)
+      updateUserService.execute(idValido, { nome: 'Qualquer Nome' }, adminLogado)
     ).rejects.toMatchObject({
       statusCode: 404,
       message: 'Usuário não encontrado',
@@ -293,11 +327,11 @@ describe('UserService - Atualização de Usuários', () => {
       role: roleAluno,
     } as User;
 
-    (userRepository.find as jest.Mock).mockResolvedValue([usuario]);
+    (userRepository.findAndCount as jest.Mock).mockResolvedValue([[usuario], 1]);
 
-    const resultado = await userService.list(adminLogado);
+    const resultado = await listUsersService.execute(adminLogado);
 
-    expect(resultado).toEqual([
+    expect(resultado.users).toEqual([
       {
         id: usuario.id,
         matricula: usuario.matricula,
@@ -307,23 +341,25 @@ describe('UserService - Atualização de Usuários', () => {
         role: roleAluno.nome,
       },
     ]);
-    expect(resultado[0]).not.toHaveProperty('senha');
-    expect(userRepository.find).toHaveBeenCalledWith({
+    expect(resultado.users[0]).not.toHaveProperty('senha');
+    expect(userRepository.findAndCount).toHaveBeenCalledWith({
       where: {},
       relations: ['role'],
       order: {
         nome: 'ASC',
       },
+      take: 10,
+      skip: 0
     });
   });
 
   it('Deve permitir que um PROFESSOR liste apenas alunos', async () => {
-    (userRepository.find as jest.Mock).mockResolvedValue([]);
+    (userRepository.findAndCount as jest.Mock).mockResolvedValue([[], 0]);
 
-    const resultado = await userService.list(professorLogado);
+    const resultado = await listUsersService.execute(professorLogado);
 
-    expect(resultado).toEqual([]);
-    expect(userRepository.find).toHaveBeenCalledWith({
+    expect(resultado.users).toEqual([]);
+    expect(userRepository.findAndCount).toHaveBeenCalledWith({
       where: {
         role: {
           nome: 'ALUNO',
@@ -333,6 +369,8 @@ describe('UserService - Atualização de Usuários', () => {
       order: {
         nome: 'ASC',
       },
+      take: 10,
+      skip: 0
     });
   });
 });
@@ -343,7 +381,10 @@ describe('UserService - Busca de usuário por ID', () => {
   const roleAdmin = { id: 'bd1de63c-5df5-4dfd-9736-ace2d7f092b1', nome: 'ADMIN' } as Role;
 
   const adminLogado = { id: '16dd67fd-afec-4080-a36f-0c8605d9c662', role: roleAdmin } as User;
-  const professorLogado = { id: 'cea50a97-f63e-4cd6-8a2c-e2a02f93c6e4', role: roleProfessor } as User;
+  const professorLogado = {
+    id: 'cea50a97-f63e-4cd6-8a2c-e2a02f93c6e4',
+    role: roleProfessor,
+  } as User;
 
   const idValido = '16dd67fd-afec-4080-a36f-0c8605d9c662';
 
@@ -364,7 +405,7 @@ describe('UserService - Busca de usuário por ID', () => {
 
     (userRepository.findOne as jest.Mock).mockResolvedValue(usuario);
 
-    const resultado = await userService.getById(idValido);
+    const resultado = await getUserService.execute(idValido);
 
     expect(resultado).toEqual({
       id: usuario.id,
@@ -388,13 +429,13 @@ describe('UserService - Busca de usuário por ID', () => {
 
     (userRepository.findOne as jest.Mock).mockResolvedValue(usuario);
 
-    const resultado = await userService.getById(idValido);
+    const resultado = await getUserService.execute(idValido);
 
     expect(resultado.role).toBe('ALUNO');
   });
 
   it('Não deve buscar usuário com ID inválido', async () => {
-    await expect(userService.getById('id-invalido')).rejects.toMatchObject({
+    await expect(getUserService.execute('id-invalido')).rejects.toMatchObject({
       statusCode: 400,
       message: 'ID de usuário inválido',
     });
@@ -405,7 +446,7 @@ describe('UserService - Busca de usuário por ID', () => {
   it('Não deve buscar usuário inexistente', async () => {
     (userRepository.findOne as jest.Mock).mockResolvedValue(null);
 
-    await expect(userService.getById(idValido)).rejects.toMatchObject({
+    await expect(getUserService.execute(idValido)).rejects.toMatchObject({
       statusCode: 404,
       message: 'Usuário não encontrado',
     });

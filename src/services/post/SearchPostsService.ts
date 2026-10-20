@@ -11,6 +11,8 @@ export class SearchPostsService {
       throw new AppError(400, 'Termo de busca inválido.');
     }
 
+    const MAX_NUM_POSTS = 10
+
     const posts = await postRepository.find({
       where: [
         { titulo: ILike(`%${termoBusca}%`) },
@@ -19,6 +21,7 @@ export class SearchPostsService {
       ],
       relations: { user: true, subject: true },
       order: { dataCriacao: 'ASC' },
+      take: MAX_NUM_POSTS
     });
 
     return posts.map(post => ({

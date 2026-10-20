@@ -279,7 +279,7 @@ paths:
       tags:
         - Posts
       summary: Buscar posts
-      description: Busca posts por palavras-chave presentes no título, descrição ou conteúdo, sem diferenciar letras maiúsculas e minúsculas.
+      description: Busca posts por palavras-chave presentes no título, descrição ou conteúdo, sem diferenciar letras maiúsculas e minúsculas. Retorna, no máximo, 10 posts
       security:
         - sessionCookie: []
       parameters:
@@ -732,22 +732,66 @@ paths:
       description: Lista usuários cadastrados. Administradores visualizam todos os usuários; professores visualizam apenas alunos.
       security:
         - sessionCookie: []
+      parameters:
+        - name: p
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          description: Número da página que será retornada. Se não informado, será utilizada a primeira página.
+
+        - name: l
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 10
+          description: Número de registros retornados por página. Se não informado, será utilizado o padrão de 10.
+
+        - name: role
+          in: query
+          required: false
+          schema:
+            type: string
+          example: PROFESSOR
+          description: Filtra retorno por tipo de usuário. Se não informado, o filtro não é aplicado
+
       responses:
         '200':
           description: Usuários retornados com sucesso.
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Usuario'
+                type: object
+                properties:
+                  users:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Usuario'
+                  pagination:
+                    type: object
+                    properties:
+                      currentPage:
+                        type: integer
+                      totalPages:
+                        type: integer
+                      pageLength:
+                        type: integer
               example:
-                - id: ae853bf8-9297-4ec2-b13d-3ddbbf332f4f
-                  matricula: '303030'
-                  nome: João Silva
-                  birthDate: '2010-08-15'
-                  image: /api/user/916f9d1e-dd31-46ef-b019-db09dcfa50ea/image
-                  role: ALUNO
+                users:
+                  - id: ae853bf8-9297-4ec2-b13d-3ddbbf332f4f
+                    matricula: '303030'
+                    nome: João Silva
+                    birthDate: '2010-08-15'
+                    image: /api/user/916f9d1e-dd31-46ef-b019-db09dcfa50ea/image
+                    role: ALUNO
+                pagination:
+                  currentPage: 8
+                  totalPages: 8
+                  pageLength: 10
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':
