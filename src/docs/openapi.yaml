@@ -279,7 +279,7 @@ paths:
       tags:
         - Posts
       summary: Buscar posts
-      description: Busca posts por palavras-chave presentes no título, descrição ou conteúdo, sem diferenciar letras maiúsculas e minúsculas.
+      description: Busca posts por palavras-chave presentes no título, descrição ou conteúdo, sem diferenciar letras maiúsculas e minúsculas. Retorna, no máximo, 10 posts
       security:
         - sessionCookie: []
       parameters:
