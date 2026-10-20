@@ -21,7 +21,10 @@ export class UserController {
 
   async list(request: Request, response: Response, next: NextFunction) {
     try {
-      const usuarios = await listUsersService.execute(request.user);
+      const filterRole = String(request.query.role ?? '');
+      const currentPage = Number(String(request.query.p ?? '1'));
+      const pageLength = Number(String(request.query.l ?? '0'));
+      const usuarios = await listUsersService.execute(request.user, filterRole, currentPage, pageLength);
 
       return response.status(200).json(usuarios);
     } catch (error) {

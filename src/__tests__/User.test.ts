@@ -11,6 +11,7 @@ import { getUserService } from '../services/users/GetUserService';
 jest.mock('../repositories/UserRepository', () => ({
   userRepository: {
     find: jest.fn(),
+    findAndCount: jest.fn(),
     findOne: jest.fn(),
     create: jest.fn(),
     save: jest.fn(),
@@ -149,11 +150,11 @@ describe('UserService - Criação de Usuários', () => {
       role: roleAluno,
     } as User;
 
-    (userRepository.find as jest.Mock).mockResolvedValue([usuario]);
+    (userRepository.findAndCount as jest.Mock).mockResolvedValue([[usuario], 1]);
 
     const resultado = await listUsersService.execute(adminLogado);
 
-    expect(resultado).toEqual([
+    expect(resultado.users).toEqual([
       {
         id: usuario.id,
         matricula: usuario.matricula,
@@ -163,23 +164,25 @@ describe('UserService - Criação de Usuários', () => {
         role: roleAluno.nome,
       },
     ]);
-    expect(resultado[0]).not.toHaveProperty('senha');
-    expect(userRepository.find).toHaveBeenCalledWith({
+    expect(resultado.users[0]).not.toHaveProperty('senha');
+    expect(userRepository.findAndCount).toHaveBeenCalledWith({
       where: {},
       relations: ['role'],
       order: {
         nome: 'ASC',
       },
+      take: 10,
+      skip: 0
     });
   });
 
   it('Deve permitir que um PROFESSOR liste apenas alunos', async () => {
-    (userRepository.find as jest.Mock).mockResolvedValue([]);
+    (userRepository.findAndCount as jest.Mock).mockResolvedValue([[], 0]);
 
     const resultado = await listUsersService.execute(professorLogado);
 
-    expect(resultado).toEqual([]);
-    expect(userRepository.find).toHaveBeenCalledWith({
+    expect(resultado.users).toEqual([]);
+    expect(userRepository.findAndCount).toHaveBeenCalledWith({
       where: {
         role: {
           nome: 'ALUNO',
@@ -189,6 +192,8 @@ describe('UserService - Criação de Usuários', () => {
       order: {
         nome: 'ASC',
       },
+      take: 10,
+      skip: 0
     });
   });
 });
@@ -322,11 +327,11 @@ describe('UserService - Atualização de Usuários', () => {
       role: roleAluno,
     } as User;
 
-    (userRepository.find as jest.Mock).mockResolvedValue([usuario]);
+    (userRepository.findAndCount as jest.Mock).mockResolvedValue([[usuario], 1]);
 
     const resultado = await listUsersService.execute(adminLogado);
 
-    expect(resultado).toEqual([
+    expect(resultado.users).toEqual([
       {
         id: usuario.id,
         matricula: usuario.matricula,
@@ -336,23 +341,25 @@ describe('UserService - Atualização de Usuários', () => {
         role: roleAluno.nome,
       },
     ]);
-    expect(resultado[0]).not.toHaveProperty('senha');
-    expect(userRepository.find).toHaveBeenCalledWith({
+    expect(resultado.users[0]).not.toHaveProperty('senha');
+    expect(userRepository.findAndCount).toHaveBeenCalledWith({
       where: {},
       relations: ['role'],
       order: {
         nome: 'ASC',
       },
+      take: 10,
+      skip: 0
     });
   });
 
   it('Deve permitir que um PROFESSOR liste apenas alunos', async () => {
-    (userRepository.find as jest.Mock).mockResolvedValue([]);
+    (userRepository.findAndCount as jest.Mock).mockResolvedValue([[], 0]);
 
     const resultado = await listUsersService.execute(professorLogado);
 
-    expect(resultado).toEqual([]);
-    expect(userRepository.find).toHaveBeenCalledWith({
+    expect(resultado.users).toEqual([]);
+    expect(userRepository.findAndCount).toHaveBeenCalledWith({
       where: {
         role: {
           nome: 'ALUNO',
@@ -362,6 +369,8 @@ describe('UserService - Atualização de Usuários', () => {
       order: {
         nome: 'ASC',
       },
+      take: 10,
+      skip: 0
     });
   });
 });
