@@ -780,6 +780,10 @@ paths:
                         type: integer
                       pageLength:
                         type: integer
+                      totalItems:
+                        type: integer
+                        minimum: 0
+                        description: Total de usuários que atendem ao filtro e às permissões do usuário autenticado, antes da paginação.
               example:
                 users:
                   - id: ae853bf8-9297-4ec2-b13d-3ddbbf332f4f
@@ -792,6 +796,7 @@ paths:
                   currentPage: 8
                   totalPages: 8
                   pageLength: 10
+                  totalItems: 71
         '401':
           $ref: '#/components/responses/UnauthorizedError'
         '403':

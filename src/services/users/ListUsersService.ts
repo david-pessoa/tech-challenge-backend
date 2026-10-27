@@ -69,6 +69,7 @@ export class ListUsersService {
         currentPage,
         totalPages,
         pageLength,
+        totalItems: registerNum,
       },
     };
   }

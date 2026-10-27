@@ -28,6 +28,37 @@ jest.mock('bcryptjs', () => ({
   hash: jest.fn().mockResolvedValue('senha_criptografada_fake'),
 }));
 
+describe('Paginação da listagem de usuários', () => {
+  beforeEach(() => jest.clearAllMocks());
+
+  it.each([
+    ['ADMIN', 'ALUNO', 13],
+    ['PROFESSOR', 'ADMIN', 7],
+    ['ADMIN', 'ALUNO', 0],
+  ])('Retorna o total de registros permitidos para %s ao filtrar %s com total %i', async (role, filterRole, total) => {
+    const usuarioLogado = { role: { nome: role } } as User;
+    const users = Array.from({ length: Math.min(5, total) }, (_, index) => ({
+      id: String(index), nome: `Aluno ${index}`, matricula: String(index), role: { nome: 'ALUNO' },
+    } as User));
+    (userRepository.findAndCount as jest.Mock).mockResolvedValue([users, total]);
+
+    const resultado = await listUsersService.execute(usuarioLogado, filterRole, 1, 5);
+
+    expect(resultado.users).toHaveLength(Math.min(5, total));
+    expect(resultado.pagination).toEqual({
+      currentPage: 1,
+      totalPages: Math.ceil(total / 5),
+      pageLength: 5,
+      totalItems: total,
+    });
+    expect(userRepository.findAndCount).toHaveBeenCalledWith(expect.objectContaining({
+      where: { role: { nome: 'ALUNO' } },
+      take: 5,
+      skip: 0,
+    }));
+  });
+});
+
 describe('UserService - Criação de Usuários', () => {
   const roleAdmin = { id: 'bd1de63c-5df5-4dfd-9736-ace2d7f092b1', nome: 'ADMIN' } as Role;
   const roleProfessor = { id: '5a0e25a2-afa5-44e1-b519-4d1e2139725a', nome: 'PROFESSOR' } as Role;
