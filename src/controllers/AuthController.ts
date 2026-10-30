@@ -27,6 +27,16 @@ export class AuthController {
     }
   }
 
+  async mobileLogin(request: Request, response: Response, next: NextFunction) {
+    try {
+      // Pega matrícula e senha do corpo da requisição e passa pro service
+      const resultado = await authService.login(request.body);
+      response.json(resultado);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async logout(request: Request, response: Response, next: NextFunction) {
     try {
       response.clearCookie(env.auth.cookieName, {

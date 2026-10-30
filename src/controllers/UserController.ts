@@ -86,7 +86,7 @@ export class UserController {
       usuarioLogado.role = usuarioLogado.role.nome;
       if (usuarioLogado.image) usuarioLogado.image = `/api/user/${usuarioLogado.id}/image`;
       if (usuarioLogado.image) usuarioLogado.birthDate = usuarioLogado.birthDate;
-
+      console.log(usuarioLogado)
       response.status(200).json(usuarioLogado);
     } catch (error) {
       return next(error);
